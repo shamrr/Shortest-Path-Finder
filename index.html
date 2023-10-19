@@ -4,9 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shortest Path Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="overlay">
+        <div class="modal modal-greeting">
+            <div class="modal__container">
+                <div class="modal__content">
+                    <h2 class="subtitle">
+                        press the start button and select the starting and ending cell of the route
+                    </h2>
+                    <button class="btn btn__play" onclick="startPlay()">Play</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="title">Shortest Path Finder</h1>
+        <div class="btns">
+            <button class="btn btn__start">Build</button>
+            <button class="btn btn__reset">Reset</button>
+        </div>
+        <div class="grid"></div>
+    </div>
     <script src="index.js"></script>
 </body>
 </html>
