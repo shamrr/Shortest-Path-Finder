@@ -41,7 +41,9 @@ body{
 .btns{
     margin: 2rem 0;
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
+    position: relative;
+    transition: all .3s;
 }
 
 .btn{
@@ -49,7 +51,7 @@ body{
     color: #33462f;
     background-color: #F5DEB3;
     cursor: pointer;
-    padding: 1rem 2rem;
+    padding: 1rem 3rem;
     max-width: 10rem;
     width: 100%;
     font-size: 1.5rem;
@@ -58,8 +60,24 @@ body{
     margin: 0 auto;
 }
 
+
+.arrow{
+    display: block;
+    color: red;
+    font-size: 5rem;
+    position: absolute;
+    top: -1.3rem;
+    left: -3.5rem;
+    opacity: 0;
+    transition: opacity .4s;
+}
+
+.arrow.active {
+    opacity: 1;
+}
+
 .btn:hover{
-    transform: translate(.3rem, -.3rem);
+    transform: translate(.2rem, -.2rem);
 }
 
 .btn:active{
