@@ -90,7 +90,7 @@ function findPath() {
         }
     }
 
-    let pathCell = end;
+    let pathCell = end.previous;
     while (pathCell.previous) {
         setColor(getCellElement(pathCell), '#33462f');
         pathCell = pathCell.previous;
