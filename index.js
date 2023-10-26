@@ -77,8 +77,9 @@ function setColor(cell, color) {
 
 function findPath() {
     const startTime = performance.now(); // Засекаем время начала поиска пути
-
+    let pathFound = false;
     const queue = [];
+
     start = cellField.find(cell => getCellElement(cell).style.backgroundColor === 'green');
     end = cellField.find(cell => getCellElement(cell).style.backgroundColor === 'red');
 
@@ -105,10 +106,14 @@ function findPath() {
         }
     }
 
-    let pathCell = end.previous;
+    let pathCell = end;
     while (pathCell.previous) {
         setColor(getCellElement(pathCell), '#33462f');
         pathCell = pathCell.previous;
+    }
+
+    if(end.visited) {
+        pathFound = true;
     }
 
     const endTime = performance.now(); // Засекаем время окончания поиска пути
@@ -118,11 +123,18 @@ function findPath() {
     const timeElement = document.querySelector('.modal__time');
     timeElement.textContent = timeElapsed.toFixed(2) + ' ms';
 
-    // Показываем модальное окно
-    setTimeout(() =>{
-        overlay.classList.remove('active');
-        modalResult.classList.add('active');
-    }, 2000)
+
+
+    if(pathFound) {
+        // Показываем модальное окно
+        setTimeout(() =>{
+            overlay.classList.remove('active');
+            modalResult.classList.add('active');
+        }, 2000)
+    } else {
+        alert('Impossible to build a path');
+        resetData();
+    }
 }
 
 
