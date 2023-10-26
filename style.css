@@ -113,11 +113,45 @@ body{
     background-color: #33462f;
 }
 
+.modal__container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .modal__content{
     border-radius: 30px 30px 0  0;
 }
 
 .btn__start{
     margin-top: 30px;
+}
+
+.modal__content p{
+    font-size: 3rem;
+}
+.modal__time{
+    font-size: 3rem;
+}
+
+.modal__close{
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-result{
+    display: none;
+}
+
+.modal-result.active{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 /* MODAL STYLES END */
