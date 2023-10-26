@@ -1,12 +1,16 @@
 const grid = document.querySelector('.grid');
 const overlay = document.querySelector('.overlay');
-let start = null;
-let end = null;
-const btnBuild = document.querySelector('.btn__build');
 const arrow = document.querySelector('.arrow');
-const cellField = [];
+const modalResult = document.querySelector('.modal-result');
 const numRows = 100;
 const numCols = 100;
+
+let start = null;
+let end = null;
+let clickCount = 0;
+let obstacleMode = false;
+
+const cellField = [];
 
 //определяем класс
 class Cell {
@@ -17,35 +21,44 @@ class Cell {
     }
 }
 
-//заполняем клеточное поле в dom необходимым кол-вом ячеек и также жобавляем объект каждой ячейки с ее индексами в массив
-function fillTheCeilField() {
+//заполняем поле необходимым кол-вом клеток и заполняем массив объектами
+function fillCellField() {
     for (let i = 0; i < numRows; i++) {
         for (let j = 0; j < numCols; j++) {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             grid.appendChild(cell);
-
             cellField.push(new Cell(i, j));
         }
     }
-    findStartAndEndElement();
-}
-fillTheCeilField();
-
-
-//устанавливаем цвет фона для элемента в dom
-function setColor(cell, color) {
-    cell.style.backgroundColor = color;
+    addEventListeners();
 }
 
-function findStartAndEndElement() {
-    let clickCount = 0;
+function addEventListeners() {
+    grid.addEventListener('mousedown', handleGridMousedown);
+    grid.addEventListener('mouseup', handleGridMouseup);
+    grid.addEventListener('click', handleGridClick);
+}
 
-    grid.addEventListener('click', (event) => {
-        clickCount++;
+function handleGridMousedown(event) {
+    const { target } = event;
 
-        const { target } = event;
+    if (target.style.backgroundColor === 'black') {
+        obstacleMode = true;
+    }
+}
 
+function handleGridMouseup() {
+    obstacleMode = false;
+}
+
+function handleGridClick(event) {
+    clickCount++;
+    const { target } = event;
+
+    if (obstacleMode) {
+        setColor(target, 'black');
+    } else {
         if (clickCount === 1) {
             setColor(target, 'green');
         } else if (clickCount === 2) {
@@ -54,15 +67,17 @@ function findStartAndEndElement() {
         } else {
             setColor(target, 'black');
         }
-
-        // if (clickCount > 2) {
-        //     target.removeEventListener('click');
-        // }
-    });
+    }
 }
 
-//функция для нахождения пути минимального
+//устанавливаем цвет фона для элемента в dom 
+function setColor(cell, color) {
+    cell.style.backgroundColor = color;
+}
+
 function findPath() {
+    const startTime = performance.now(); // Засекаем время начала поиска пути
+
     const queue = [];
     start = cellField.find(cell => getCellElement(cell).style.backgroundColor === 'green');
     end = cellField.find(cell => getCellElement(cell).style.backgroundColor === 'red');
@@ -82,7 +97,7 @@ function findPath() {
         const neighbors = getNeighbors(currentCell);
 
         for (const neighbor of neighbors) {
-            if (!neighbor.visited) {
+            if (getCellElement(neighbor).style.backgroundColor !== 'black' && !neighbor.visited) {
                 neighbor.visited = true;
                 neighbor.previous = currentCell;
                 queue.push(neighbor);
@@ -95,7 +110,21 @@ function findPath() {
         setColor(getCellElement(pathCell), '#33462f');
         pathCell = pathCell.previous;
     }
+
+    const endTime = performance.now(); // Засекаем время окончания поиска пути
+    const timeElapsed = endTime - startTime; // Вычисляем время выполнения
+
+    // Обновляем время в модальном окне
+    const timeElement = document.querySelector('.modal__time');
+    timeElement.textContent = timeElapsed.toFixed(2) + ' ms';
+
+    // Показываем модальное окно
+    setTimeout(() =>{
+        overlay.classList.remove('active');
+        modalResult.classList.add('active');
+    }, 2000)
 }
+
 
 //функция для получения всех соседей клетки
 function getNeighbors(cell) {
@@ -103,46 +132,49 @@ function getNeighbors(cell) {
     const { row, col } = cell;
 
     if (row > 0) {
-        neighbors.push(cellField.find((c) => c.row === row - 1 && c.col === col));
+        neighbors.push(cellField.find(c => c.row === row - 1 && c.col === col));
     }
     if (row < numRows - 1) {
-        neighbors.push(cellField.find((c) => c.row === row + 1 && c.col === col));
+        neighbors.push(cellField.find(c => c.row === row + 1 && c.col === col));
     }
     if (col > 0) {
-        neighbors.push(cellField.find((c) => c.row === row && c.col === col - 1));
+        neighbors.push(cellField.find(c => c.row === row && c.col === col - 1));
     }
     if (col < numCols - 1) {
-        neighbors.push(cellField.find((c) => c.row === row && c.col === col + 1));
+        neighbors.push(cellField.find(c => c.row === row && c.col === col + 1));
     }
 
     return neighbors;
-}   
+}
 
 function getCellElement(cell) {
     const index = cell.row * numCols + cell.col;
     return grid.children[index];
 }
 
-//фукнция для модального окна при открытии страницы
-function startPlay() {
-    const btnPlay = document.querySelector('.btn__start');
-
-    btnPlay.addEventListener('click', () => {
-        overlay.classList.toggle('active')
-    });
-
-   
-}
-
-//функция для сброса данных и удаления предыдущего пути с поля
+//сброс данных для возможности рассчитать новый путь
 function resetData() {
-    startCell = null;
-    endCell = null;
+    clickCount = 0;
     cellField.forEach((cell) => {
         cell.visited = false;
         delete cell.previous;
         setColor(getCellElement(cell), '');
     });
-    startPlay()
 }
 
+//функция для закрытия модального окна с правильами
+function startPlay() {
+    const btnStart = document.querySelector('.btn__start');
+
+    btnStart.addEventListener('click', () => {
+        overlay.classList.add('active')
+    });
+}
+
+//функция для того чтобы закрыть модальное окно с результатом
+function closePopup() {
+    modalResult.classList.remove('active');
+    overlay.classList.add('active')
+}
+
+fillCellField();
